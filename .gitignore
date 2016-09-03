@@ -1,7 +1,6 @@
-*.class     # java class files
-
-.DS_Store   # hidden Mac file
-.idea       # IntelliJ IDEA stuff
-*.iml		# IntelliJ IDEA stuff
-.metadata	# Eclipse stuff
-.project	# Eclipse stuff
+*.class         # java class files
+.idea/          # IntelliJ IDEA stuff
+.metadata	      # Eclipse stuff
+.project        # Eclipse stuff
+out/production*
+out/test/*
