@@ -213,6 +213,9 @@ public class TupleDesc implements Serializable {
   public String toString() {
     String ret = "";
     for (TDItem item : this.fields) {
+      if (!ret.equals("")) {
+        ret += ", ";
+      }
       ret += item.toString();
     }
     return ret;

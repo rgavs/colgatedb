@@ -1,6 +1,4 @@
 *.class         # java class files
-.idea           # IntelliJ IDEA stuff
-.metadata       # Eclipse stuff
-.project        # Eclipse stuff
+.idea	          # IntelliJ IDEA stuff
 out/production/*
 out/test/*
