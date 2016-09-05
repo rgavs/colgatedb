@@ -1,6 +1,5 @@
 package colgatedb.tuple;
 
-import colgatedb.tuple.Type;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -8,6 +7,7 @@ import java.util.NoSuchElementException;
 
 /**
  * ColgateDB
+ *
  * @author Michael Hay mhay@colgate.edu
  * <p>
  * ColgateDB was developed by Michael Hay but borrows considerably from past
@@ -65,7 +65,7 @@ public class TupleDesc implements Serializable {
    */
   public TupleDesc(Type[] typeAr, String[] fieldAr) {
     this.fields = new TDItem[typeAr.length];
-    for (int i = 0; i < typeAr.length; i++){
+    for (int i = 0; i < typeAr.length; i++) {
       this.fields[i] = new TDItem(typeAr[i], fieldAr[i]);
     }
   }
@@ -80,7 +80,7 @@ public class TupleDesc implements Serializable {
    */
   public TupleDesc(Type[] typeAr) {
     String[] temp = new String[typeAr.length];
-    for(String item : temp){
+    for (String item : temp) {
       item = "";
     }
     new TupleDesc(typeAr, temp);
@@ -90,7 +90,7 @@ public class TupleDesc implements Serializable {
    * @return the number of fields in this TupleDesc
    */
   public int numFields() {
-    if (!this.fields.equals(null))
+    if (this.fields != null)
       return this.fields.length;
     else return 0;
   }
@@ -119,7 +119,7 @@ public class TupleDesc implements Serializable {
   }
 
   private TDItem getFieldItem(int i) throws NoSuchElementException {
-    if (i >= this.numFields() || i < 0){
+    if (i >= this.numFields() || i < 0) {
       throw new NoSuchElementException();
     }
     return this.fields[i];
@@ -150,7 +150,6 @@ public class TupleDesc implements Serializable {
   public int getSize() {
     if (this.size != 0)
       return this.size;
-    this.size = 0;
     for (TDItem item : this.fields) {
       //noinspection ConstantConditions
       this.size += item.fieldType.getLen();
@@ -175,13 +174,11 @@ public class TupleDesc implements Serializable {
    * @return true if the object is equal to this TupleDesc.
    */
   public boolean equals(Object o) {
-    if (!o.getClass().equals(this.getClass()) ||
-            o.equals(null) || ((TupleDesc) o).getSize() != this.getSize() ) {
+    if (!o.getClass().equals(this.getClass()) || o.equals(null) || ((TupleDesc) o).getSize() != this.getSize()) {
       return false;
-    }
-    else {
+    } else {
       for (int i = 0; i < this.fields.length; i++) {
-        if (!fields[i].fieldType.equals(((TupleDesc) o).getFieldType(i))){
+        if (!fields[i].fieldType.equals(((TupleDesc) o).getFieldType(i))) {
           return false;
         }
       }
@@ -227,8 +224,7 @@ public class TupleDesc implements Serializable {
       if (i < td1.numFields()) {
         typeAr[i] = td1.getFieldType(i);
         fieldAr[i] = td1.getFieldName(i);
-      }
-      else {
+      } else {
         typeAr[i] = td2.getFieldType(i - td1.numFields());
         fieldAr[i] = td2.getFieldName(i - td1.numFields());
       }
