@@ -1,6 +1,7 @@
 package colgatedb.tuple;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -25,6 +26,8 @@ import java.util.NoSuchElementException;
 public class Tuple implements Serializable {
 
   private static final long serialVersionUID = 1L;
+  private TupleDesc td;
+  private Field[] fieldAr;
 
   /**
    * Create a new tuple with the specified schema (type).
@@ -32,14 +35,15 @@ public class Tuple implements Serializable {
    * @param td the schema of this tuple. It must be a valid TupleDesc instance with at least one field.
    */
   public Tuple(TupleDesc td) {
-    throw new UnsupportedOperationException("implement me!");
+    this.td = td;
+    fieldAr = new Field[td.numFields()];
   }
 
   /**
    * @return The TupleDesc representing the schema of this tuple.
    */
   public TupleDesc getTupleDesc() {
-    throw new UnsupportedOperationException("implement me!");
+    return td;
   }
 
   /**
@@ -51,7 +55,7 @@ public class Tuple implements Serializable {
    * @throws NoSuchElementException if i is not a valid field reference.
    */
   public void setField(int i, Field f) {
-    throw new UnsupportedOperationException("implement me!");
+    fieldAr[i] = f;
   }
 
   /**
@@ -60,7 +64,9 @@ public class Tuple implements Serializable {
    * @throws NoSuchElementException if i is not a valid field reference.
    */
   public Field getField(int i) {
-    throw new UnsupportedOperationException("implement me!");
+    if (i < 0 || i >= fieldAr.length)
+      throw new NoSuchElementException(i + " is an invalid index.");
+    return fieldAr[i];
   }
 
   /**
@@ -72,7 +78,15 @@ public class Tuple implements Serializable {
    * where \t is a tab and \n is a newline
    */
   public String toString() {
-    throw new UnsupportedOperationException("implement me!");
+    String ret = "";
+    for (Field col : fieldAr) {
+      if (!ret.equals("")) {
+        ret += '\t';
+      }
+      ret += col.toString();
+    }
+    ret += '\n';
+    return ret;
   }
 
 
@@ -80,8 +94,7 @@ public class Tuple implements Serializable {
    * @return An iterator which iterates over all the fields of this tuple
    */
   public Iterator<Field> fields() {
-    // hint: use java.util.Arrays.asList to convert array into a list, then return list iterator.
-    throw new UnsupportedOperationException("implement me!");
+    return Arrays.asList(fieldAr).iterator();
   }
 
   /**

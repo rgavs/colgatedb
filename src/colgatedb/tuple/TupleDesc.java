@@ -40,7 +40,7 @@ public class TupleDesc implements Serializable {
      */
     public final String fieldName;
 
-    public TDItem(Type t, String n) {
+    TDItem(Type t, String n) {
       this.fieldName = n;
       this.fieldType = t;
     }
@@ -51,54 +51,60 @@ public class TupleDesc implements Serializable {
   }
 
   private static final long serialVersionUID = 1L;
-  private TDItem[] fields;
+  private TDItem[] tdItems;
   private boolean strings = false;
   private int size = 0;
 
   /**
-   * Create a new TupleDesc with typeAr.length fields of the
+   * Create a new TupleDesc with typeAr.length tdItems of the
    * specified types and with associated names.
    *
-   * @param typeAr  array specifying the number of and types of fields in this
+   * @param typeAr  array specifying the number of and types of tdItems in this
    *                TupleDesc. It must contain at least one entry.
-   * @param fieldAr array specifying the names of the fields. Note that names may
+   * @param fieldAr array specifying the names of the tdItems. Note that names may
    *                be null.
    */
   public TupleDesc(Type[] typeAr, String[] fieldAr) {
     if (typeAr.length != fieldAr.length){
-      throw new RuntimeException("Input arguments are of incompatable length.");
+      throw new RuntimeException("Input arguments are of incompatible length.");
     }
-    fields = new TDItem[typeAr.length];
-    for (int i = 0; i < fields.length; i++) {
+    tdItems = new TDItem[typeAr.length];
+    for (int i = 0; i < tdItems.length; i++) {
       if(!this.strings) {
-        if (!fieldAr[i].equals("")) {
+        if (!fieldAr[i].equals("") && !fieldAr[i].equals(null)) {
+          this.tdItems[i] = new TDItem(typeAr[i], fieldAr[i]);
           this.strings = true;
         }
+        else {
+          this.tdItems[i] = new TDItem(typeAr[i], "");
+        }
       }
-      this.fields[i] = new TDItem(typeAr[i], fieldAr[i]);
+    }
+    if (!strings) {
+      throw new NoSuchElementException("All field names are null");
     }
   }
 
   /**
-   * Constructor. Create a new tuple desc with typeAr.length fields with
-   * fields of the specified types.  Field names should be assigned as empty
+   * Constructor. Create a new tuple desc with typeAr.length tdItems with
+   * tdItems of the specified types.  Field names should be assigned as empty
    * strings.
    *
-   * @param typeAr array specifying the number of and types of fields in this
+   * @param typeAr array specifying the number of and types of tdItems in this
    *               TupleDesc. It must contain at least one entry.
    */
   public TupleDesc(Type[] typeAr) {
-    for(int i = 0; i < fields.length; i++) {
-      fields[i] = new TDItem(typeAr[i], null);
+    for(int i = 0; i < tdItems.length; i++) {
+      tdItems[i] = new TDItem(typeAr[i], null);
     }
   }
 
   /**
-   * @return the number of fields in this TupleDesc
+   * @return the number of tdItems in this TupleDesc
    */
   public int numFields() {
-    if (this.fields != null)
-      return fields.length;
+    if (this.tdItems != null)
+      return tdItems.length;
     else
       return 0;
   }
@@ -115,7 +121,7 @@ public class TupleDesc implements Serializable {
     if (i >= this.numFields() || i < 0) {
       throw new NoSuchElementException();
     }
-    return this.fields[i].fieldType;
+    return this.tdItems[i].fieldType;
   }
 
   /**
@@ -129,7 +135,7 @@ public class TupleDesc implements Serializable {
     if (i >= this.numFields() || i < 0) {
       throw new NoSuchElementException();
     }
-    return this.fields[i].fieldName;
+    return this.tdItems[i].fieldName;
   }
 
   /**
@@ -140,9 +146,9 @@ public class TupleDesc implements Serializable {
    * @throws NoSuchElementException if no field with a matching name is found.
    */
   public int fieldNameToIndex(String name) throws NoSuchElementException {
-    /*if (!strings) {*/
-      //throw new NoSuchElementException("No fields are named, so " + name + " cannot be found.");
-    /*}*/
+    if (!strings) {
+      throw new NoSuchElementException("No tdItems are named, so " + name + " cannot be found.");
+    }
     for (int i = 0; i < this.numFields(); i++) {
       if (this.getFieldName(i).equals(name)) {
         return i;
@@ -160,7 +166,7 @@ public class TupleDesc implements Serializable {
   public int getSize() {
     if (this.size != 0)
       return this.size;
-    for (TDItem item : fields) {
+    for (TDItem item : tdItems) {
       //noinspection ConstantConditions
       this.size += item.fieldType.getLen();
     }
@@ -172,7 +178,7 @@ public class TupleDesc implements Serializable {
    * that are included in this TupleDesc
    */
   public Iterator<TDItem> iterator() {
-    return Arrays.asList(this.fields).iterator();
+    return Arrays.asList(this.tdItems).iterator();
   }
 
   /**
@@ -187,8 +193,8 @@ public class TupleDesc implements Serializable {
     if (((Object) null).equals(o) || !o.getClass().equals(this.getClass()) || ((TupleDesc) o).getSize() != this.getSize()) {
       return false;
     } else {
-      for (int i = 0; i < this.fields.length; i++) {
-        if (!fields[i].fieldType.equals(((TupleDesc) o).getFieldType(i))) {
+      for (int i = 0; i < this.tdItems.length; i++) {
+        if (!tdItems[i].fieldType.equals(((TupleDesc) o).getFieldType(i))) {
           return false;
         }
       }
@@ -212,7 +218,7 @@ public class TupleDesc implements Serializable {
    */
   public String toString() {
     String ret = "";
-    for (TDItem item : this.fields) {
+    for (TDItem item : this.tdItems) {
       if (!ret.equals("")) {
         ret += ", ";
       }
@@ -222,11 +228,11 @@ public class TupleDesc implements Serializable {
   }
 
   /**
-   * Merge two TupleDescs into one, with td1.numFields + td2.numFields fields,
+   * Merge two TupleDescs into one, with td1.numFields + td2.numFields tdItems,
    * with the first td1.numFields coming from td1 and the remaining from td2.
    *
-   * @param td1 The TupleDesc with the first fields of the new TupleDesc
-   * @param td2 The TupleDesc with the last fields of the TupleDesc
+   * @param td1 The TupleDesc with the first tdItems of the new TupleDesc
+   * @param td2 The TupleDesc with the last tdItems of the TupleDesc
    * @return the new TupleDesc
    */
   public static TupleDesc merge(TupleDesc td1, TupleDesc td2) {
