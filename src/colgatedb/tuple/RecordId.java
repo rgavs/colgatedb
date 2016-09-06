@@ -75,7 +75,6 @@ public class RecordId implements Serializable {
   public int hashCode() {
     // you do not need to implement for lab 1
     throw new UnsupportedOperationException("implement me!");
-
   }
 
 }
